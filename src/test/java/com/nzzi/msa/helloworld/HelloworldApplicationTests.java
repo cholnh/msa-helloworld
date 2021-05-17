@@ -19,9 +19,4 @@ class HelloworldApplicationTests {
         assertEquals(2, 1 + 1);
     }
 
-    @Test
-    @DisplayName("실패하는 테스트 실행")
-    void failed_test() {
-        assertEquals(1, 1 + 1);
-    }
 }
