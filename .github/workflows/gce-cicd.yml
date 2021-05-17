@@ -49,7 +49,7 @@ jobs:
     - name: Build Docker Image And Delivery To GCR
       run: |
         IMAGE=${{ secrets.IMAGE }}
-        INPUT=$(gcloud container images list-tags ${IMAGE})
+        INPUT=$(gcloud container images list-tags --format='get(tags)' ${IMAGE})
         TAGS=$(echo ${INPUT[0]} | awk -F ' ' '{print $1}')
         LATEST_TAG=$(echo ${TAGS[0]} | awk -F ';' '{print $1}')
         ADD=0.01
