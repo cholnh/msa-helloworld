@@ -59,7 +59,7 @@ jobs:
         docker build --tag ${IMAGE}:${NEW_VERSION} .
         docker push ${IMAGE}:${NEW_VERSION}
         docker tag ${IMAGE}:${NEW_VERSION} ${IMAGE}:latest
-        docker push ${IMAGE}:latest
+        docker push ${IMAGE}
     
     # SSH 접속을 통한 직접 배포
 #     - name: Deploy to GCE
