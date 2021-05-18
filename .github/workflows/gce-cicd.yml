@@ -56,6 +56,8 @@ jobs:
         VERSION=$(echo "${LATEST_TAG} $ADD" | awk '{print $1 + $2}')
         NEW_VERSION=$(printf "%.2g\n" "${VERSION}")
         echo ${NEW_VERSION}
+        ls -a
+        
         docker build --tag ${IMAGE}:${NEW_VERSION} .
         docker push ${IMAGE}:${NEW_VERSION}
         docker tag ${IMAGE}:${NEW_VERSION} ${IMAGE}:latest
