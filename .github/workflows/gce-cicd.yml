@@ -41,7 +41,7 @@ jobs:
           service_account_key: ${{ secrets.GCP_SA_KEY }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
-    
+        
 #     # GCR 연결 위한 인증 작업 실행
 #     - name: Set Auth GCR 
 #       run: gcloud --quiet auth configure-docker
@@ -67,6 +67,8 @@ jobs:
     # Build and push image to Google Container Registry
     - name: Build
       run: |-
+        pwd
+        ls -a
         gcloud builds submit \
           --quiet \
           --tag "gcr.io/$PROJECT_ID/$REPOSITORY_NAME:$GITHUB_SHA"
