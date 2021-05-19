@@ -37,7 +37,7 @@ jobs:
     
     # Gcloud CLI 세팅
     - name: Set up Gcloud
-    - uses: google-github-actions/setup-gcloud@master
+      uses: google-github-actions/setup-gcloud@master
       with:
         version: '290.0.1'
         service_account_key: ${{ secrets.GCP_SA_KEY }}
