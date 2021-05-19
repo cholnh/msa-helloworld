@@ -74,9 +74,9 @@ jobs:
         script: |
           CONTAINER_NAME=hello-container
           IMAGE=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
+          sudo gcloud --quiet auth configure-docker
           sudo docker ps -q --filter "name=$CONTAINER_NAME" | grep -q . && sudo docker stop $CONTAINER_NAME
           sudo docker system prune -a -f
-          sudo docker pull $IMAGE:latest
           sudo docker run -d --name "$CONTAINER_NAME" --rm -p ${{ secrets.CONTAINER_PORT }}:${{ secrets.CONTAINER_PORT }} $IMAGE:latest
     
     # 작업 결과 슬랙 전송
