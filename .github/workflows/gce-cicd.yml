@@ -14,6 +14,7 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
   REPOSITORY_NAME: ${{ secrets.REPOSITORY_NAME }}
   IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
+  DEPLOY_REGION: asia-east1
   
 jobs:
   build:
@@ -81,7 +82,7 @@ jobs:
       run: |-
         gcloud run deploy "$REPOSITORY_NAME" \
           --quiet \
-          --region "$GCE_INSTANCE_ZONE" \
+          --region "$DEPLOY_REGION" \
           --image "gcr.io/$PROJECT_ID/$REPOSITORY_NAME" \
           --platform "managed" \
           --allow-unauthenticated
