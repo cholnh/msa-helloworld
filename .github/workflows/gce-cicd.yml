@@ -13,7 +13,8 @@ env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
   REPOSITORY_NAME: ${{ secrets.REPOSITORY_NAME }}
-
+  IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -42,40 +43,38 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           export_default_credentials: true
         
-#     # GCR 연결 위한 인증 작업 실행
-#     - name: Set Auth GCR 
-#       run: gcloud --quiet auth configure-docker
+    # GCR 연결 위한 인증 작업 실행
+    - name: Set Auth GCR 
+      run: gcloud --quiet auth configure-docker
     
-#     # GCR에서 이전 버전 참고하여 다음 버전 만든 후, 이미지 빌드 및 푸쉬
-#     - name: Build Docker Image And Delivery To GCR
-#       run: |
-#         IMAGE=${{ secrets.IMAGE }}
-#         INPUT=$(gcloud container images list-tags --format='get(tags)' ${IMAGE})
-#         TAGS=$(echo ${INPUT[0]} | awk -F ' ' '{print $1}')
-#         LATEST_TAG=$(echo ${TAGS[0]} | awk -F ';' '{print $1}')
-#         ADD=0.01
-#         VERSION=$(echo "${LATEST_TAG} $ADD" | awk '{print $1 + $2}')
-#         NEW_VERSION=$(printf "%.2g\n" "${VERSION}")
-#         echo ${NEW_VERSION}
-#         echo ${{ secrets.IMAGE }}
+    # GCR에서 이전 버전 참고하여 다음 버전 만든 후, 이미지 빌드 및 푸쉬
+    - name: Build Docker Image And Delivery To GCR
+      run: |
+        INPUT=$(gcloud container images list-tags --format='get(tags)' $IMAGE)
+        TAGS=$(echo ${INPUT[0]} | awk -F ' ' '{print $1}')
+        LATEST_TAG=$(echo ${TAGS[0]} | awk -F ';' '{print $1}')
+        ADD=0.01
+        VERSION=$(echo "${LATEST_TAG} $ADD" | awk '{print $1 + $2}')
+        NEW_VERSION=$(printf "%.2g\n" "${VERSION}")
+        echo ${NEW_VERSION}
         
-#         docker build --tag ${IMAGE}:${NEW_VERSION} .
-#         docker push ${IMAGE}:${NEW_VERSION}
-#         docker tag ${IMAGE}:${NEW_VERSION} ${IMAGE}:latest
-#         docker push ${IMAGE}:latest
+        docker build --tag $IMAGE:${NEW_VERSION} .
+        docker push $IMAGE:${NEW_VERSION}
+        docker tag $IMAGE:${NEW_VERSION} $IMAGE:latest
+        docker push $IMAGE:latest
 
-    # Build and push image to Google Container Registry
-    - name: Build
-      run: |-
-        cd build/libs
-        ls -a
-        pwd
-        cd ..
-        cd ..
-        pwd
-        gcloud builds submit \
-          --quiet \
-          --tag "gcr.io/$PROJECT_ID/$REPOSITORY_NAME:$GITHUB_SHA"
+#     # Build and push image to Google Container Registry
+#     - name: Build
+#       run: |-
+#         cd build/libs
+#         ls -a
+#         pwd
+#         cd ..
+#         cd ..
+#         pwd
+#         gcloud builds submit \
+#           --quiet \
+#           --tag "gcr.io/$PROJECT_ID/$REPOSITORY_NAME:$GITHUB_SHA"
     
    # Deploy image to Cloud Run
     - name: Deploy
@@ -83,7 +82,7 @@ jobs:
         gcloud run deploy "$REPOSITORY_NAME" \
           --quiet \
           --region "$GCE_INSTANCE_ZONE" \
-          --image "gcr.io/$PROJECT_ID/$REPOSITORY_NAME:$GITHUB_SHA" \
+          --image "gcr.io/$PROJECT_ID/$REPOSITORY_NAME" \
           --platform "managed" \
           --allow-unauthenticated
     
