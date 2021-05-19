@@ -75,12 +75,9 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           CONTAINER_NAME=hello-container
-          IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
-          echo $CONTAINER_NAME
-          echo $IMAGE
+          IMAGE=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
           sudo docker ps -q --filter "name=$CONTAINER_NAME" | grep -q . && sudo docker stop $CONTAINER_NAME
-          
-    # sudo docker run -d --name "$CONTAINER_NAME" --rm -p 8080:8080 $IMAGE
+          sudo docker run -d --name "$CONTAINER_NAME" --rm -p 8080:8080 $IMAGE
     
     # 작업 결과 슬랙 전송
     - name: Result to Slack
