@@ -67,8 +67,12 @@ jobs:
     # Build and push image to Google Container Registry
     - name: Build
       run: |-
-        pwd
+        cd build/libs
         ls -a
+        pwd
+        cd ..
+        cd ..
+        pwd
         gcloud builds submit \
           --quiet \
           --tag "gcr.io/$PROJECT_ID/$REPOSITORY_NAME:$GITHUB_SHA"
