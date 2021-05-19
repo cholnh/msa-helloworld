@@ -75,8 +75,10 @@ jobs:
         key: ${{ secrets.SSH_KEY }}
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
+          echo $CONTAINER_NAME
           sudo docker ps -q --filter "name=$CONTAINER_NAME" | grep -q . && sudo docker stop $CONTAINER_NAME
-          sudo docker run -d --name "$CONTAINER_NAME" --rm -p $PORT_OUT:$PORT_IN $IMAGE
+          
+    # sudo docker run -d --name "$CONTAINER_NAME" --rm -p $PORT_OUT:$PORT_IN $IMAGE
     
     # 작업 결과 슬랙 전송
     - name: Result to Slack
