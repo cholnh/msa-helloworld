@@ -35,6 +35,15 @@ jobs:
         chmod +x gradlew
         ./gradlew build
     
+    # Gcloud CLI 세팅
+    - name: Set up Gcloud
+    - uses: google-github-actions/setup-gcloud@master
+      with:
+        version: '290.0.1'
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        export_default_credentials: true
+    
     # GCR 연결 위한 인증 작업 실행
     - name: Set Auth GCR 
       run: gcloud --quiet auth configure-docker
@@ -54,14 +63,7 @@ jobs:
         docker tag $IMAGE:${NEW_VERSION} $IMAGE:latest
         docker push $IMAGE:latest
     
-    # Gcloud CLI 세팅
-    - name: Set up Gcloud And Connect GCE And execute docker run
-    - uses: google-github-actions/setup-gcloud@master
-      with:
-        version: '290.0.1'
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        export_default_credentials: true
+    - name: Connect GCE And execute docker run
     - run: |-
         gcloud compute ssh "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" -- 'docker ps'
     
