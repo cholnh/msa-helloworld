@@ -12,6 +12,7 @@ env:
   GCE_INSTANCE_ZONE: ${{ secrets.GCE_INSTANCE_ZONE }}	
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
+  REPOSITORY_NAME: ${{ secrets.REPOSITORY_NAME }}
 
 jobs:
   build:
@@ -21,18 +22,6 @@ jobs:
     # "master" 체크아웃
     - name: Checkout
       uses: actions/checkout@v2
-    
-    # Gcloud 세팅
-    - name: Set up Gcloud
-      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
-      with:
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          export_default_credentials: true
-    
-    # GCR 연결 위한 인증 작업 실행
-    - name: Set Auth GCR 
-      run: gcloud --quiet auth configure-docker
     
     # Java + Gradle 기반 앱 테스트 및 빌드
     - name: Set up JDK 1.8
@@ -45,31 +34,51 @@ jobs:
         chmod +x gradlew
         ./gradlew build
     
-    # GCR에서 이전 버전 참고하여 다음 버전 만든 후, 이미지 빌드 및 푸쉬
-    - name: Build Docker Image And Delivery To GCR
-      run: |
-        IMAGE=${{ secrets.IMAGE }}
-        INPUT=$(gcloud container images list-tags --format='get(tags)' ${IMAGE})
-        TAGS=$(echo ${INPUT[0]} | awk -F ' ' '{print $1}')
-        LATEST_TAG=$(echo ${TAGS[0]} | awk -F ';' '{print $1}')
-        ADD=0.01
-        VERSION=$(echo "${LATEST_TAG} $ADD" | awk '{print $1 + $2}')
-        NEW_VERSION=$(printf "%.2g\n" "${VERSION}")
-        echo ${NEW_VERSION}
-        echo ${{ secrets.IMAGE }}
-        
-        docker build --tag ${IMAGE}:${NEW_VERSION} .
-        docker push ${IMAGE}:${NEW_VERSION}
-        docker tag ${IMAGE}:${NEW_VERSION} ${IMAGE}:latest
-        docker push ${IMAGE}:latest
+    # Gcloud CLI 세팅
+    - name: Set up Gcloud
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          export_default_credentials: true
     
+#     # GCR 연결 위한 인증 작업 실행
+#     - name: Set Auth GCR 
+#       run: gcloud --quiet auth configure-docker
+    
+#     # GCR에서 이전 버전 참고하여 다음 버전 만든 후, 이미지 빌드 및 푸쉬
+#     - name: Build Docker Image And Delivery To GCR
+#       run: |
+#         IMAGE=${{ secrets.IMAGE }}
+#         INPUT=$(gcloud container images list-tags --format='get(tags)' ${IMAGE})
+#         TAGS=$(echo ${INPUT[0]} | awk -F ' ' '{print $1}')
+#         LATEST_TAG=$(echo ${TAGS[0]} | awk -F ';' '{print $1}')
+#         ADD=0.01
+#         VERSION=$(echo "${LATEST_TAG} $ADD" | awk '{print $1 + $2}')
+#         NEW_VERSION=$(printf "%.2g\n" "${VERSION}")
+#         echo ${NEW_VERSION}
+#         echo ${{ secrets.IMAGE }}
+        
+#         docker build --tag ${IMAGE}:${NEW_VERSION} .
+#         docker push ${IMAGE}:${NEW_VERSION}
+#         docker tag ${IMAGE}:${NEW_VERSION} ${IMAGE}:latest
+#         docker push ${IMAGE}:latest
+
+    # Build and push image to Google Container Registry
+    - name: Build
+      run: |-
+        gcloud builds submit \
+          --quiet \
+          --tag "gcr.io/$PROJECT_ID/$REPOSITORY_NAME:$GITHUB_SHA"
+    
+   # Deploy image to Cloud Run
     - name: Deploy
       run: |-
-        gcloud run deploy "${{ secrets.IMAGE }}" \
+        gcloud run deploy "$REPOSITORY_NAME" \
           --quiet \
           --region "$GCE_INSTANCE_ZONE" \
-          --image "${{ secrets.IMAGE }}" \
-          --platform "managed"  \
+          --image "gcr.io/$PROJECT_ID/$REPOSITORY_NAME:$GITHUB_SHA" \
+          --platform "managed" \
           --allow-unauthenticated
     
 #     - name: Connect GCE And execute docker run
