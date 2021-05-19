@@ -73,9 +73,9 @@ jobs:
       uses: appleboy/ssh-action@master
       with:
         host: ${{ secrets.SSH_HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        password: ${{ secrets.SSH_PASSWORD }}
-#         passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        USERNAME: ${{ secrets.SSH_USERNAME }}
+        KEY: ${{ secrets.SSH_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           pwd
           ls -al
