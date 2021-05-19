@@ -14,7 +14,6 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
   REPOSITORY_NAME: ${{ secrets.REPOSITORY_NAME }}
   IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
-  DEPLOY_REGION: asia-east1
   
 jobs:
   build:
@@ -57,40 +56,16 @@ jobs:
         ADD=0.01
         VERSION=$(echo "${LATEST_TAG} $ADD" | awk '{print $1 + $2}')
         NEW_VERSION=$(printf "%.2g\n" "${VERSION}")
-        echo ${NEW_VERSION}
-        
+        echo ${NEW_VERSION} 
         docker build --tag $IMAGE:${NEW_VERSION} .
         docker push $IMAGE:${NEW_VERSION}
         docker tag $IMAGE:${NEW_VERSION} $IMAGE:latest
         docker push $IMAGE:latest
-
-#     # Build and push image to Google Container Registry
-#     - name: Build
-#       run: |-
-#         cd build/libs
-#         ls -a
-#         pwd
-#         cd ..
-#         cd ..
-#         pwd
-#         gcloud builds submit \
-#           --quiet \
-#           --tag "gcr.io/$PROJECT_ID/$REPOSITORY_NAME:$GITHUB_SHA"
     
-   # Deploy image to Cloud Run
-    - name: Deploy
+    - name: Connect GCE And execute docker run
       run: |-
-        gcloud run deploy "$REPOSITORY_NAME" \
-          --quiet \
-          --region "$DEPLOY_REGION" \
-          --image "gcr.io/$PROJECT_ID/$REPOSITORY_NAME" \
-          --platform "managed" \
-          --allow-unauthenticated
-    
-#     - name: Connect GCE And execute docker run
-#       run: |-
-#         gcloud compute ssh "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" \
-#           -- 'sudo chown root:docker /var/run/docker.sock && docker ps && docker ps -q --filter "name=hello-container" | grep -q . && docker stop hello-container && docker run -d --name "hello-container" --rm -p 8080:8080 ${{ secrets.IMAGE }}'
+        gcloud compute ssh "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" \
+          -- 'sudo chown root:docker /var/run/docker.sock && docker ps'
     
     # SSH 접속을 통한 직접 배포
 #     - name: Deploy to GCE
