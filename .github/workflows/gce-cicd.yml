@@ -14,6 +14,9 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} 
   REPOSITORY_NAME: ${{ secrets.REPOSITORY_NAME }}
   IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
+  CONTAINER_NAME: hello-container
+  PORT_IN: 8080
+  PORT_OUT: 8080
   
 jobs:
   build:
@@ -65,7 +68,7 @@ jobs:
     
     - name: Connect GCE And execute docker run
       run: |-
-        gcloud compute ssh "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" -- 'sudo docker ps'
+        gcloud compute ssh "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" -- 'sudo docker ps && sudo docker ps -q --filter "name=$CONTAINER_NAME" | grep -q . && sudo docker stop $CONTAINER_NAME && sudo docker run -d --name "$CONTAINER_NAME" --rm -p $PORT_OUT:$PORT_IN $IMAGE && sudo docker ps'
     
     # SSH 접속을 통한 직접 배포
 #     - name: Deploy to GCE
