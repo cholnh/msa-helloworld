@@ -64,18 +64,22 @@ jobs:
         docker tag $IMAGE:${NEW_VERSION} $IMAGE:latest
         docker push $IMAGE:latest
     
-    - name: Connect GCE And execute docker run
-      run: |-
-        gcloud compute ssh "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" -- 'sudo docker images && sudo docker ps && sudo docker run -d --name "hello-container" --rm -p 8080:8080 $IMAGE'
+#     - name: Connect GCE And execute docker run
+#       run: |-
+#         gcloud compute ssh "$GCE_INSTANCE" --zone "$GCE_INSTANCE_ZONE" -- 'sudo docker images && sudo docker ps && sudo docker run -d --name "hello-container" --rm -p 8080:8080 $IMAGE'
 
     # SSH 접속을 통한 직접 배포
-#     - name: Deploy to GCE
-#       uses: appleboy/ssh-action@master
-#       with:
-#         host: ${{ secrets.HOST }}
-#         username: ${{ secrets.USERNAME }}
-#         password: ${{ secrets.PASSWORD }}
-#         script: whoami
+    - name: Deploy to GCE
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        password: ${{ secrets.PASSWORD }}
+        script: |
+          pwd
+          ls -al
+          sudo docker images
+          whoami
     
     # 작업 결과 슬랙 전송
     - name: Result to Slack
