@@ -74,8 +74,8 @@ jobs:
       with:
         host: ${{ secrets.SSH_HOST }}
         username: ${{ secrets.SSH_USERNAME }}
-        passphrase: ${{ secrets.SSH_PASSPHRASE }}
-        key: ${{ secrets.SSH_KEY }}
+        password: ${{ secrets.SSH_PASSWORD }}
+#         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         script: |
           pwd
           ls -al
