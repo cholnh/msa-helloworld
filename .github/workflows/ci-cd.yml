@@ -10,9 +10,9 @@ on:
     paths-ignore:
       - "**.md"
 
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
   build:
@@ -50,7 +50,7 @@ jobs:
       # GCR에서 이전 버전 참고하여 다음 버전 만든 후, 이미지 빌드 및 푸쉬
       - name: Build Docker Image And Delivery To GCR
         run: |
-          IMAGE: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
+          IMAGE=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.REPOSITORY_NAME }}
           INPUT=$(gcloud container images list-tags --format='get(tags)' $IMAGE)
           LATEST_TAG=$(echo ${INPUT[0]} | awk -F ' ' '{print $1}' | awk -F ';' '{print $1}')
           ADD=0.01
