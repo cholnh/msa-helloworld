@@ -10,6 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class HelloApi {
     @GetMapping
     public ResponseEntity<?> hello() {
-        return ResponseEntity.ok("success hello world! -v4");
+        return ResponseEntity.ok("success hello world!!");
     }
 }
