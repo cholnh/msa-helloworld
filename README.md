@@ -1,1 +1,1 @@
-![example workflow](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+![example workflow](https://github.com/cholnh/msa-helloworld/actions/workflows/gce-cicd.yml/badge.svg)
