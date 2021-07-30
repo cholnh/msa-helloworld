@@ -75,6 +75,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # "master" 체크아웃
+      - name: Checkout
+        uses: actions/checkout@v2
+
       # GKE deploy
       - name: Deploy to GKE Cluster
         uses: ameydev/gke-kubectl-action@master
