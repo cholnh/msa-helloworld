@@ -1,11 +1,11 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mono-app
+  name: hello-mono-deployment
   labels:
-    app: mono-app
+    app: mono-deployment
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: mono-app
@@ -15,7 +15,7 @@ spec:
         app: mono-app
     spec:
       containers:
-      - name: hello-container
+      - name: hello-mono-container
         image: gcr.io/nzzi-test-project/hello-repo:latest
         ports:
         - containerPort: 8080
