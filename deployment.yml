@@ -15,7 +15,7 @@ spec:
         app: mono-app
     spec:
       containers:
-      - name: mono-app
+      - name: hello-container
         image: gcr.io/nzzi-test-project/hello-repo:latest
         ports:
         - containerPort: 8080
