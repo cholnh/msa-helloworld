@@ -84,8 +84,8 @@ jobs:
           ZONE_NAME: ${{ secrets.GKE_CLUSTER_ZONE }}
         with:
           args: |
-            apply -f ~/deployment-hello-mono.yml
-            apply -f ~/service-hello-mono.yml
+            apply -f deployment.yml
+            apply -f service.yml
 
       # 작업 결과 슬랙 전송
       - name: Result to Slack
