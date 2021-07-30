@@ -3,19 +3,19 @@ kind: Deployment
 metadata:
   name: mono-app
   labels:
-    app: hello-mono-app
+    app: mono-app
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: hello-mono-app
+      app: mono-app
   template:
     metadata:
       labels:
-        app: hello-mono-app
+        app: mono-app
     spec:
       containers:
-      - name: hello-mono-app
+      - name: hello-container
         image: gcr.io/nzzi-test-project/hello-repo:latest
         ports:
         - containerPort: 8080
